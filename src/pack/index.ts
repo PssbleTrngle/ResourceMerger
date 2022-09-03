@@ -25,7 +25,9 @@ export default async function mergeResources(options: Options) {
       .map(it => ({ ...it, config: config.packs[it.name] }))
       .filter(it => !it.config?.disabled)
 
-   const folders = ['assets', 'data']
+   const folders: string[] = []
+   if (options.includeAssets) folders.push('assets')
+   if (options.includeData) folders.push('data')
 
    function resolversOf({ path, name, info, config }: typeof packs[0]) {
       const paths = config?.paths ?? ['.']
