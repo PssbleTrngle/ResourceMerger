@@ -1,6 +1,6 @@
 {
    "name": "resource-merger",
-   "version": "1.0",
+   "version": "1.0.0",
    "description": "Resource Merger",
    "main": "dist/pack.js",
    "type": "module",
