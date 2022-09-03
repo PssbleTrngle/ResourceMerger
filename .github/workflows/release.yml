@@ -23,7 +23,7 @@ jobs:
                  - recursive: true
                    args: [--frozen-lockfile, --strict-peer-dependencies]
 
-         - run: npm config set_authToken=${{ secrets.GITHUB_TOKEN }}
-
          - run: npm build
          - run: npm publish
+           env:
+              NODE_AUTH_TOKEN: ${{ secret.GITHUB_TOKEN }}
