@@ -20,16 +20,16 @@ export interface Options {
    zipOutput: boolean
 }
 
-function readConfig() {
-   const file = args['--config'] ?? '.mergerrc'
+function readConfig(configFile?: string) {
+   const file = configFile ?? args['--config'] ?? '.mergerrc'
    if (existsSync(file)) {
       const buffer = readFileSync(file)
       return JSON.parse(buffer.toString()) as Partial<Options>
    }
    return null
 }
-export default function getOptions(): Options {
-   const config = readConfig()
+export default function getOptions(configFile?: string): Options {
+   const config = readConfig(configFile)
    const output = args['--output'] ?? config?.output ?? 'merged.zip'
    const existingOutputDir = existsSync(output) && statSync(output).isDirectory()
 

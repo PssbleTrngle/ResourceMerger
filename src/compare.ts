@@ -1,6 +1,6 @@
+import { ArchiveResolver } from '@pssbletrngle/pack-resolver'
 import chalk from 'chalk'
 import { existsSync } from 'fs'
-import ArchiveResolver from './pack/resolver/ArchiveResolver.js'
 import { fileHash } from './util.js'
 
 async function compare(reference: string, generated: string) {
