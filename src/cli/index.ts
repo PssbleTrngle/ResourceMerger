@@ -7,20 +7,7 @@ async function run() {
    const options = getOptions()
    const resolvers = createResolvers(options)
    const mergers = createDefaultMergers(options)
-   const acceptor = mergers.createAcceptor()
-
-   mergers.emptyDir()
-
-   console.group('Extracting resources...')
-   await Promise.all(
-      resolvers.map(async ({ resolver, name }) => {
-         console.log(name)
-         await resolver.extract(acceptor)
-      })
-   )
-   console.groupEnd()
-
-   await mergers.finalize()
+   await mergers.run(resolvers)
 }
 
 run().catch(async e => {
