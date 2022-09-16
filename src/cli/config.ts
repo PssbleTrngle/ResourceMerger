@@ -1,6 +1,7 @@
+import { Options as ResolverOptions } from '@pssbletrngle/pack-resolver'
 import arg from 'arg'
-import { existsSync, readFileSync, statSync } from 'fs'
-import { extname } from 'path'
+import { existsSync, readFileSync } from 'fs'
+import Options from '../options.js'
 
 const args = arg({
    '--config': String,
@@ -11,27 +12,20 @@ const args = arg({
    '-c': '--config',
 })
 
-export interface Options {
-   from: string
-   output: string
-   includeAssets: boolean
-   includeData: boolean
-   title: string
-   zipOutput: boolean
-}
+export interface CliOptions extends Options, ResolverOptions {}
 
 function readConfig(configFile?: string) {
    const file = configFile ?? args['--config'] ?? '.mergerrc'
    if (existsSync(file)) {
       const buffer = readFileSync(file)
-      return JSON.parse(buffer.toString()) as Partial<Options>
+      return JSON.parse(buffer.toString()) as Partial<CliOptions>
    }
    return null
 }
-export default function getOptions(configFile?: string): Options {
+
+export default function getOptions(configFile?: string): CliOptions {
    const config = readConfig(configFile)
    const output = args['--output'] ?? config?.output ?? 'merged.zip'
-   const existingOutputDir = existsSync(output) && statSync(output).isDirectory()
 
    return {
       from: args['--from'] ?? config?.from ?? 'resources',
@@ -39,6 +33,5 @@ export default function getOptions(configFile?: string): Options {
       includeData: args['--include-data'] ?? config?.includeData ?? false,
       title: 'Test',
       output,
-      zipOutput: !existingOutputDir && ['.zip', '.jar'].includes(extname(output)),
    }
 }

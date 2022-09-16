@@ -1,12 +1,12 @@
 import { Acceptor } from '@pssbletrngle/pack-resolver'
 import chalk from 'chalk'
-import { existsSync, readFileSync, writeFileSync } from 'fs'
-import { emptyDirSync, ensureDirSync } from 'fs-extra'
+import { existsSync, readFileSync, statSync, writeFileSync } from 'fs'
+import { ensureDirSync } from 'fs-extra'
 import lodash from 'lodash'
 import minimatch from 'minimatch'
-import { dirname, join, resolve } from 'path'
+import { dirname, extname, join, resolve } from 'path'
 import { zip } from 'zip-a-folder'
-import { Options } from '../cli/config'
+import Options from '../options.js'
 import { fileHash } from '../util.js'
 
 export interface Merger<T> {
@@ -27,12 +27,31 @@ export class JsonMerger<T> implements Merger<T> {
    }
 }
 
+const defaultOptions: Required<Options> = {
+   includeAssets: false,
+   includeData: false,
+   output: 'merger.zip',
+   title: 'Merged',
+}
+
 export class Mergers {
-   constructor(
-      private readonly options: Omit<Options, 'from'>,
-      private readonly mergers: Record<string, Merger<unknown>>
-   ) {
-      emptyDirSync(this.tempDir)
+   private readonly tempDir: string
+   private readonly folders: ReadonlyArray<string>
+   private readonly options: Required<Options>
+   private readonly zipOutput: boolean
+
+   constructor(options: Options, private readonly mergers: Record<string, Merger<unknown>>) {
+      this.options = { ...defaultOptions, ...options }
+
+      const existingOutputDir = existsSync(this.options.output) && statSync(this.options.output).isDirectory()
+      this.zipOutput = !existingOutputDir && ['.zip', '.jar'].includes(extname(this.options.output))
+
+      this.tempDir = this.zipOutput ? resolve('tmp') : this.options.output
+
+      const folders = []
+      if (this.options.includeAssets) folders.push('assets')
+      if (this.options.includeData) folders.push('data')
+      this.folders = folders
    }
 
    private handle<T>(merger: Merger<T>, a: Buffer | string, b: Buffer | string) {
@@ -47,20 +66,8 @@ export class Mergers {
       return this.merged
    }
 
-   public get overwrittenFiles() {
+   public get overwrittenFiles(): ReadonlyArray<string> {
       return lodash.uniq(this.overwritten)
-   }
-
-   private get folders() {
-      const folders = []
-      if (this.options.includeAssets) folders.push('assets')
-      if (this.options.includeData) folders.push('data')
-      return folders
-   }
-
-   private get tempDir() {
-      const outDir = this.options.zipOutput ? resolve('tmp') : this.options.output
-      return outDir
    }
 
    public createAcceptor(): Acceptor {
@@ -115,7 +122,7 @@ export class Mergers {
       }
       writeFileSync(join(this.tempDir, 'pack.mcmeta'), JSON.stringify(packData, null, 2))
 
-      if (this.options.zipOutput) {
+      if (this.zipOutput) {
          console.log('Creating ZIP File...')
          await zip(this.tempDir, this.options.output)
 

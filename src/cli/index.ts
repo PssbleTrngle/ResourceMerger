@@ -5,7 +5,7 @@ import getOptions from './config.js'
 
 async function run() {
    const options = getOptions()
-   const resolvers = await createResolvers(options)
+   const resolvers = createResolvers(options)
    const mergers = createDefaultMergers(options)
    const acceptor = mergers.createAcceptor()
 
