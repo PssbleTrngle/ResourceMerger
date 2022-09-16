@@ -7,10 +7,7 @@ import minimatch from 'minimatch'
 import { dirname, join, resolve } from 'path'
 import { zip } from 'zip-a-folder'
 import { Options } from '../cli/config'
-import LangMerger from '../merger/LangMerger.js'
-import { default as ModelMerger } from '../merger/ModelMerger.js'
-import TagMerger from '../merger/TagMerger.js'
-import { fileHash } from '../util'
+import { fileHash } from '../util.js'
 
 export interface Merger<T> {
    merge(a: T, b: T): T
@@ -126,12 +123,4 @@ export class Mergers {
          console.log(`SHA256: ${hash}`)
       }
    }
-}
-
-export function createDefaultMerger(options: Omit<Options, 'from'>) {
-   return new Mergers(options, {
-      'assets/*/models/**/*.json': ModelMerger,
-      'assets/*/lang/**/*.json': LangMerger,
-      'data/*/tags/**/*.json': TagMerger,
-   })
 }
