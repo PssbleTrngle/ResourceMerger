@@ -9,6 +9,8 @@ async function run() {
    const mergers = createDefaultMergers(options)
    const acceptor = mergers.createAcceptor()
 
+   mergers.emptyDir()
+
    console.group('Extracting resources...')
    await Promise.all(
       resolvers.map(async ({ resolver, name }) => {

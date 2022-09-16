@@ -1,7 +1,7 @@
 import { Acceptor } from '@pssbletrngle/pack-resolver'
 import chalk from 'chalk'
 import { existsSync, readFileSync, statSync, writeFileSync } from 'fs'
-import { ensureDirSync } from 'fs-extra'
+import { emptyDirSync, ensureDirSync } from 'fs-extra'
 import lodash from 'lodash'
 import minimatch from 'minimatch'
 import { dirname, extname, join, resolve } from 'path'
@@ -98,7 +98,11 @@ export class Mergers {
       }
    }
 
-   async finalize() {
+   public emptyDir() {
+      emptyDirSync(this.tempDir)
+   }
+
+   public async finalize() {
       if (this.mergedFiles > 0) console.log(chalk.gray(`Merged ${this.mergedFiles} files`))
       if (this.overwrittenFiles.length > 0) {
          const patterns = lodash.uniq(
