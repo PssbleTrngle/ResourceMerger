@@ -32,6 +32,7 @@ const defaultOptions: Required<Options> = {
    includeData: false,
    output: 'merger.zip',
    title: 'Merged',
+   packFormat: 9,
 }
 
 export class Mergers {
@@ -145,7 +146,7 @@ export class Mergers {
       const packData = {
          pack: {
             description: `${this.options.title} - generated ${new Date().toLocaleDateString()}`,
-            pack_format: 8,
+            pack_format: this.options.packFormat,
          },
       }
       writeFileSync(join(this.outDir, 'pack.mcmeta'), JSON.stringify(packData, null, 2))

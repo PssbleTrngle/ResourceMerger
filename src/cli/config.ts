@@ -9,6 +9,7 @@ const args = arg({
    '--include-data': Boolean,
    '--from': String,
    '--output': String,
+   '--pack-format': Number,
    '-c': '--config',
 })
 
@@ -32,6 +33,7 @@ export default function getOptions(configFile?: string): CliOptions {
       includeAssets: args['--include-assets'] ?? config?.includeAssets ?? false,
       includeData: args['--include-data'] ?? config?.includeData ?? false,
       title: 'Test',
+      packFormat: args['--pack-format'] ?? config?.packFormat,
       output,
    }
 }

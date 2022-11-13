@@ -3,4 +3,5 @@ export default interface Options {
    includeAssets?: boolean
    includeData?: boolean
    title?: string
+   packFormat?: number
 }
