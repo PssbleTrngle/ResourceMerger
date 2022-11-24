@@ -4,18 +4,6 @@ import commandLineUsage, { Section } from 'command-line-usage'
 import { existsSync, readFileSync } from 'fs'
 import Options from '../options.js'
 
-const args = arg({
-   '--config': String,
-   '--include-assets': Boolean,
-   '--include-data': Boolean,
-   '--from': String,
-   '--output': String,
-   '--pack-format': Number,
-   '-c': '--config',
-   '--help': Boolean,
-   '-h': '--help',
-})
-
 const sections: Section[] = [
    {
       header: 'Resource Merger',
@@ -27,9 +15,9 @@ const sections: Section[] = [
          {
             name: 'config',
             alias: 'c',
-            defaultValue: '(from)/config.json',
+            defaultValue: '.mergerrc',
             typeLabel: '{underline string}',
-            description: 'The path of the optional resource-resolver config file',
+            description: 'The to read additional options from',
          },
          {
             name: 'include-assets',
@@ -59,6 +47,7 @@ const sections: Section[] = [
          },
          {
             name: 'help',
+            alias: 'h',
             description: 'Print this usage guide.',
          },
       ],
@@ -68,7 +57,7 @@ const sections: Section[] = [
 export interface CliOptions extends Options, ResolverOptions {}
 
 function readConfig(configFile?: string) {
-   const file = configFile ?? args['--config'] ?? '.mergerrc'
+   const file = configFile ?? '.mergerrc'
    if (existsSync(file)) {
       const buffer = readFileSync(file)
       return JSON.parse(buffer.toString()) as Partial<CliOptions>
@@ -77,13 +66,25 @@ function readConfig(configFile?: string) {
 }
 
 export default function getOptions(configFile?: string): CliOptions {
+   const args = arg({
+      '--config': String,
+      '--include-assets': Boolean,
+      '--include-data': Boolean,
+      '--from': String,
+      '--output': String,
+      '--pack-format': Number,
+      '-c': '--config',
+      '--help': Boolean,
+      '-h': '--help',
+   })
+
    if (args['--help']) {
       const usage = commandLineUsage(sections)
       console.log(usage)
       process.exit(0)
    }
 
-   const config = readConfig(configFile)
+   const config = readConfig(configFile ?? args['--config'])
    const output = args['--output'] ?? config?.output ?? 'merged.zip'
 
    return {
