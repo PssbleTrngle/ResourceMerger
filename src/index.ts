@@ -1,4 +1,4 @@
-export { default as getMergeOptions } from './cli/config.js'
+export { readConfig as getMergeOptions } from './cli/config.js'
 export { default as createDefaultMergers } from './merger/default.js'
 export * from './merger/index.js'
 export { default as LangMerger } from './merger/LangMerger.js'

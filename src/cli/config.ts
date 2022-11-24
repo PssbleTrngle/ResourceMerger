@@ -56,7 +56,7 @@ const sections: Section[] = [
 
 export interface CliOptions extends Options, ResolverOptions {}
 
-function readConfig(configFile?: string) {
+export function readConfig(configFile?: string) {
    const file = configFile ?? '.mergerrc'
    if (existsSync(file)) {
       const buffer = readFileSync(file)
