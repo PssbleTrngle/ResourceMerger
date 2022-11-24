@@ -1,5 +1,6 @@
 import { Options as ResolverOptions } from '@pssbletrngle/pack-resolver'
 import arg from 'arg'
+import commandLineUsage, { Section } from 'command-line-usage'
 import { existsSync, readFileSync } from 'fs'
 import Options from '../options.js'
 
@@ -11,7 +12,58 @@ const args = arg({
    '--output': String,
    '--pack-format': Number,
    '-c': '--config',
+   '--help': Boolean,
+   '-h': '--help',
 })
+
+const sections: Section[] = [
+   {
+      header: 'Resource Merger',
+      content: 'Merge multiple resource & datapack into single archive files',
+   },
+   {
+      header: 'Options',
+      optionList: [
+         {
+            name: 'config',
+            alias: 'c',
+            defaultValue: '(from)/config.json',
+            typeLabel: '{underline string}',
+            description: 'The path of the optional resource-resolver config file',
+         },
+         {
+            name: 'include-assets',
+            description: 'Include files in the {italic assets} folder',
+         },
+         {
+            name: 'include-data',
+            description: 'Include files in the {italic data} folder',
+         },
+         {
+            name: 'from',
+            defaultValue: './resources',
+            typeLabel: '{underline directory}',
+            description: 'The folder to look in for datapacks & resourcepacks',
+         },
+         {
+            name: 'output',
+            defaultValue: 'merged.zip',
+            typeLabel: '{underline file}',
+            description: 'The path of the output archive file',
+         },
+         {
+            name: 'pack-format',
+            defaultValue: '9',
+            typeLabel: '{underline number}',
+            description: 'The {italic pack_format} value written to the generated {italic pack.mcmeta}',
+         },
+         {
+            name: 'help',
+            description: 'Print this usage guide.',
+         },
+      ],
+   },
+]
 
 export interface CliOptions extends Options, ResolverOptions {}
 
@@ -25,6 +77,12 @@ function readConfig(configFile?: string) {
 }
 
 export default function getOptions(configFile?: string): CliOptions {
+   if (args['--help']) {
+      const usage = commandLineUsage(sections)
+      console.log(usage)
+      process.exit(0)
+   }
+
    const config = readConfig(configFile)
    const output = args['--output'] ?? config?.output ?? 'merged.zip'
 
