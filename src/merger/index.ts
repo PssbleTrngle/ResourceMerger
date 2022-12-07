@@ -1,4 +1,4 @@
-import { Acceptor, ResolverInfo } from '@pssbletrngle/pack-resolver'
+import { Acceptor, IResolver } from '@pssbletrngle/pack-resolver'
 import chalk from 'chalk'
 import { existsSync, readFileSync, statSync, writeFileSync } from 'fs'
 import { emptyDirSync, ensureDirSync } from 'fs-extra'
@@ -109,17 +109,12 @@ export class Mergers {
       emptyDirSync(this.outDir)
    }
 
-   public async run(resolvers: ResolverInfo[]) {
+   public async run(resolver: IResolver) {
       this.emptyDir()
       const acceptor = this.createAcceptor()
 
       console.group('Extracting resources...')
-      await Promise.all(
-         resolvers.map(async ({ resolver, name }) => {
-            console.log(name)
-            await resolver.extract(acceptor)
-         })
-      )
+      await resolver.extract(acceptor)
       console.groupEnd()
 
       await this.finalize()
