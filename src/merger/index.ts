@@ -33,6 +33,7 @@ const defaultOptions: Required<Options> = {
    output: 'merger.zip',
    title: 'Merged',
    packFormat: 9,
+   overwrite: true,
 }
 
 export class Mergers {
@@ -78,15 +79,23 @@ export class Mergers {
       return lodash.uniq(this.overwritten)
    }
 
+   exists(path: string) {
+      if (this.zipOutput) return false
+      const out = join(this.outDir, path)
+      return existsSync(out)
+   }
+
    public createAcceptor(): Acceptor {
       return (path, content) => {
          if (!this.folders.some(it => path.startsWith(it))) return
 
          const out = join(this.outDir, path)
+         const cached = existsSync(out)
+         if (cached && !this.options.overwrite) return
          ensureDirSync(dirname(out))
 
          const getContent = () => {
-            if (existsSync(out)) {
+            if (cached) {
                const merger = Object.entries(this.mergers).find(([pattern]) => minimatch(path, pattern))?.[1]
                if (merger != null) {
                   const existing = readFileSync(out)

@@ -4,4 +4,5 @@ export default interface Options {
    includeData?: boolean
    title?: string
    packFormat?: number
+   overwrite?: boolean
 }

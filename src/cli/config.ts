@@ -16,7 +16,6 @@ const sections: Section[] = [
             name: 'config',
             alias: 'c',
             defaultValue: '.mergerrc',
-            typeLabel: '{underline string}',
             description: 'The to read additional options from',
          },
          {
@@ -26,6 +25,12 @@ const sections: Section[] = [
          {
             name: 'include-data',
             description: 'Include files in the {italic data} folder',
+         },
+         {
+            name: 'overwrite',
+            type: Boolean,
+            defaultValue: true,
+            description: 'Overwrite already existing files',
          },
          {
             name: 'from',
@@ -42,12 +47,13 @@ const sections: Section[] = [
          {
             name: 'pack-format',
             defaultValue: '9',
-            typeLabel: '{underline number}',
+            type: Number,
             description: 'The {italic pack_format} value written to the generated {italic pack.mcmeta}',
          },
          {
             name: 'help',
             alias: 'h',
+            type: Boolean,
             description: 'Print this usage guide.',
          },
       ],
@@ -73,6 +79,7 @@ export default function getOptions(configFile?: string): CliOptions {
       '--from': String,
       '--output': String,
       '--pack-format': Number,
+      '--overwrite': Boolean,
       '-c': '--config',
       '--help': Boolean,
       '-h': '--help',
@@ -92,6 +99,7 @@ export default function getOptions(configFile?: string): CliOptions {
       includeAssets: args['--include-assets'] ?? config?.includeAssets ?? false,
       includeData: args['--include-data'] ?? config?.includeData ?? false,
       title: 'Test',
+      overwrite: args['--overwrite'],
       packFormat: args['--pack-format'] ?? config?.packFormat,
       output,
    }
