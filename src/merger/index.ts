@@ -27,12 +27,15 @@ export class JsonMerger<T> implements Merger<T> {
    }
 }
 
-const defaultOptions: Required<Options> = {
-   output: 'merger.zip',
+const createOptions = (partial: Options): Required<Options> => ({
+   output: 'merged.zip',
    title: 'Merged',
    packFormat: 9,
    overwrite: true,
-}
+   clean: partial.overwrite ?? true,
+   silent: false,
+   ...partial,
+})
 
 export class Mergers {
    private readonly outDir: string
@@ -41,7 +44,7 @@ export class Mergers {
    private readonly cleanup?: () => void
 
    constructor(options: Options, private readonly mergers: Record<string, Merger<unknown>>) {
-      this.options = { ...defaultOptions, ...options }
+      this.options = createOptions(options)
 
       const existingOutputDir = existsSync(this.options.output) && statSync(this.options.output).isDirectory()
       this.zipOutput = !existingOutputDir && ['.zip', '.jar'].includes(extname(this.options.output))
@@ -113,28 +116,30 @@ export class Mergers {
       this.emptyDir()
       const acceptor = this.createAcceptor()
 
-      console.group('Extracting resources...')
+      if (!this.options.silent) console.group('Extracting resources...')
       await resolver.extract(acceptor)
-      console.groupEnd()
+      if (!this.options.silent) console.groupEnd()
 
       await this.finalize()
    }
 
    public async finalize() {
-      if (this.mergedFiles > 0) console.log(chalk.gray(`Merged ${this.mergedFiles} files`))
-      if (this.overwrittenFiles.length > 0) {
-         const patterns = lodash.uniq(
-            this.overwrittenFiles.map(path => {
-               const [base, _, folder] = path.split(/[/\\]/)
-               if (!folder) return path
-               return join(base, '*', folder, '...')
+      if (!this.options.silent) {
+         if (this.mergedFiles > 0) console.log(chalk.gray(`Merged ${this.mergedFiles} files`))
+         if (this.overwrittenFiles.length > 0) {
+            const patterns = lodash.uniq(
+               this.overwrittenFiles.map(path => {
+                  const [base, _, folder] = path.split(/[/\\]/)
+                  if (!folder) return path
+                  return join(base, '*', folder, '...')
+               })
+            )
+            console.group(chalk.yellow(`Overwritten ${this.overwrittenFiles.length} files`))
+            patterns.forEach(pattern => {
+               console.log(chalk.yellow(pattern))
             })
-         )
-         console.group(chalk.yellow(`Overwritten ${this.overwrittenFiles.length} files`))
-         patterns.forEach(pattern => {
-            console.log(chalk.yellow(pattern))
-         })
-         console.groupEnd()
+            console.groupEnd()
+         }
       }
 
       const packData = {
@@ -146,11 +151,11 @@ export class Mergers {
       writeFileSync(join(this.outDir, 'pack.mcmeta'), JSON.stringify(packData, null, 2))
 
       if (this.zipOutput) {
-         console.log('Creating ZIP File...')
+         if (!this.options.silent) console.log('Creating ZIP File...')
          await zip(this.outDir, this.options.output)
 
          const hash = fileHash(readFileSync(this.options.output), 'sha1')
-         console.log(`SHA256: ${hash}`)
+         if (!this.options.silent) console.log(`SHA256: ${hash}`)
       }
 
       this.cleanup?.()

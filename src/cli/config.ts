@@ -37,6 +37,18 @@ const sections: Section[] = [
             description: 'Overwrite already existing files',
          },
          {
+            name: 'clean',
+            type: Boolean,
+            defaultValue: '{italic overwrite} value',
+            description: 'Empty output folder first',
+         },
+         {
+            name: 'silent',
+            type: Boolean,
+            defaultValue: true,
+            description: 'Log info',
+         },
+         {
             name: 'from',
             defaultValue: './resources',
             typeLabel: '{underline directory}',
@@ -84,6 +96,8 @@ export default function getOptions(configFile?: string): CliOptions {
       '--output': String,
       '--pack-format': Number,
       '--overwrite': Boolean,
+      '--clean': Boolean,
+      '--silent': Boolean,
       '-c': '--config',
       '--help': Boolean,
       '-h': '--help',
@@ -104,6 +118,8 @@ export default function getOptions(configFile?: string): CliOptions {
       exclude: args['--exclude'] ?? config?.include,
       title: 'Merged',
       overwrite: args['--overwrite'],
+      clean: args['--clean'],
+      silent: args['--silent'],
       packFormat: args['--pack-format'] ?? config?.packFormat,
       output,
    }
