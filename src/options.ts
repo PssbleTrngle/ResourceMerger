@@ -3,6 +3,6 @@ export default interface Options {
    title?: string
    packFormat?: number
    overwrite?: boolean
-   clean?: boolean
+   keep?: boolean
    silent?: boolean
 }

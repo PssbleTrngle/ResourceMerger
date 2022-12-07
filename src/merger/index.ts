@@ -31,8 +31,8 @@ const createOptions = (partial: Options): Required<Options> => ({
    output: 'merged.zip',
    title: 'Merged',
    packFormat: 9,
-   overwrite: true,
-   clean: partial.overwrite ?? true,
+   overwrite: false,
+   keep: !partial.overwrite,
    silent: false,
    ...partial,
 })
@@ -108,12 +108,8 @@ export class Mergers {
       }
    }
 
-   public emptyDir() {
-      emptyDirSync(this.outDir)
-   }
-
    public async run(resolver: IResolver) {
-      this.emptyDir()
+      if (!this.options.keep) emptyDirSync(this.outDir)
       const acceptor = this.createAcceptor()
 
       if (!this.options.silent) console.group('Extracting resources...')
