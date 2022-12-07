@@ -19,12 +19,16 @@ const sections: Section[] = [
             description: 'The to read additional options from',
          },
          {
-            name: 'include-assets',
-            description: 'Include files in the {italic assets} folder',
+            name: 'exclude',
+            type: [String],
+            multiple: true,
+            description: 'Exclude patterns. Will be ignored if {italic --include} is used',
          },
          {
-            name: 'include-data',
-            description: 'Include files in the {italic data} folder',
+            name: 'include',
+            type: [String],
+            multiple: true,
+            description: 'Include patterns. if used, {italic --exclude} patterns will be ignored',
          },
          {
             name: 'overwrite',
@@ -74,8 +78,8 @@ export function readConfig(configFile?: string) {
 export default function getOptions(configFile?: string): CliOptions {
    const args = arg({
       '--config': String,
-      '--include-assets': Boolean,
-      '--include-data': Boolean,
+      '--include': String,
+      '--exclude': String,
       '--from': String,
       '--output': String,
       '--pack-format': Number,
@@ -96,9 +100,9 @@ export default function getOptions(configFile?: string): CliOptions {
 
    return {
       from: args['--from'] ?? config?.from ?? 'resources',
-      includeAssets: args['--include-assets'] ?? config?.includeAssets ?? false,
-      includeData: args['--include-data'] ?? config?.includeData ?? false,
-      title: 'Test',
+      include: args['--include'] ?? config?.include,
+      exclude: args['--exclude'] ?? config?.include,
+      title: 'Merged',
       overwrite: args['--overwrite'],
       packFormat: args['--pack-format'] ?? config?.packFormat,
       output,

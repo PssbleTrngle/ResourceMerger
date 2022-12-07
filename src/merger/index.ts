@@ -28,8 +28,6 @@ export class JsonMerger<T> implements Merger<T> {
 }
 
 const defaultOptions: Required<Options> = {
-   includeAssets: false,
-   includeData: false,
    output: 'merger.zip',
    title: 'Merged',
    packFormat: 9,
@@ -38,7 +36,6 @@ const defaultOptions: Required<Options> = {
 
 export class Mergers {
    private readonly outDir: string
-   private readonly folders: ReadonlyArray<string>
    private readonly options: Required<Options>
    private readonly zipOutput: boolean
    private readonly cleanup?: () => void
@@ -56,11 +53,6 @@ export class Mergers {
       } else {
          this.outDir = this.options.output
       }
-
-      const folders = []
-      if (this.options.includeAssets) folders.push('assets')
-      if (this.options.includeData) folders.push('data')
-      this.folders = folders
    }
 
    private handle<T>(merger: Merger<T>, a: Buffer | string, b: Buffer | string) {
@@ -87,8 +79,6 @@ export class Mergers {
 
    public createAcceptor(): Acceptor {
       return (path, content) => {
-         if (!this.folders.some(it => path.startsWith(it))) return
-
          const out = join(this.outDir, path)
          const cached = existsSync(out)
          if (cached && !this.options.overwrite) return
